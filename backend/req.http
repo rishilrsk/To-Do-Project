@@ -1,0 +1,48 @@
+### User registration
+POST http://localhost:3000/user-api/user
+Content-Type: application/json
+
+{
+    "name":"test2",
+    "email":"test2@gmail.com",
+    "password":"test1",
+    "todos":[]
+}
+
+### User login
+POST http://localhost:3000/user-api/login
+Content-Type: application/json
+
+{
+    "email":"test2@gmail.com",
+    "password":"test1"   
+}
+
+
+### Add task
+PUT http://localhost:3000/user-api/todo/6931417e57db6b4f3bc462ec
+Content-Type: application/json
+
+{
+    "taskName":"sleeping",
+    "description":"I sleep early on this day"   
+}
+
+
+
+
+### Edit task
+PUT http://localhost:3000/user-api/edit-todo/user/6931417e57db6b4f3bc462ec/task/69314e315ecb41fa731d307e
+Content-Type: application/json
+
+{
+    "taskName":"sleeping again",
+    "description":"I sleep early on this day"   
+}
+
+### Set task completed
+PUT http://localhost:3000/user-api/edit-status/user/6931417e57db6b4f3bc462ec/task/69314e315ecb41fa731d307e
+
+
+### Delete task
+PUT http://localhost:8000/user-api/delete-todo/user/6931417e57db6b4f3bc462ec/task/69314e315ecb41fa731d307e
