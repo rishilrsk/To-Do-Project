@@ -5,8 +5,7 @@ function RootLayout() {
   return (
     <div>
       <Header />
-      {}
-      <div className="container mt-4">
+      <div className="container">
         <Outlet />
       </div>
     </div>

@@ -1,38 +1,42 @@
-import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import RootLayout  from "../Components/RootLayout";
-import Home from "../Components/Home";
+import RootLayout from "../Components/RootLayout";
 import Login from "../Components/Login";
 import Register from "../Components/Register";
-import RouterError from "../Components/RouterError";
+import UserProfile from "../Components/Userprofile";
+import RouterError from "../Components/RouterError"
+import Home from "../Components/Home"
 
 function App() {
-  const router = createBrowserRouter([
+  const browserRouterObj = createBrowserRouter([
     {
-      path: "/*",
+      path: "/",
       element: <RootLayout />,
       errorElement: <RouterError />,
       children: [
         {
-          path: "",
-          element: <Home />,
+            path:"home",
+            element:<Home />
         },
         {
-          path: "Login",
+          index: true,
           element: <Login />,
         },
         {
-          path: "Register",
+          path: "login",
+          element: <Login />,
+        },
+        {
+          path: "register",
           element: <Register />,
+        },
+        {
+          path: "user-profile",
+          element: <UserProfile />,
         },
       ],
     },
   ]);
-  return (
-    <div>
-      <RouterProvider router={router} />
-    </div>
-  );
+  return <RouterProvider router={browserRouterObj} />;
 }
 
 export default App;

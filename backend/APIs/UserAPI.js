@@ -1,145 +1,172 @@
-//Create mini express application
-
+//create min-express app
 import express from "express";
-import { UserModel } from "../Models/UserModel.js";
-import {hash,compare} from "bcryptjs";
+import { hash, compare } from "bcryptjs";
+import { UserModel } from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
-const {sign}= jwt
-export const userRouter= express.Router();
-import { verifyToken } from "../Middlewares/verifyToken.js";
+const { sign } = jwt;
+export const userRoute = express.Router();
 
+//Define API routes
 
-//Define User Routes
-
-
-//Routes for User Registration
-userRouter.post("/user",async(req,res)=>{
-  try{
-    //get user object
-    let newUser= req.body;
+//Route for User registration
+userRoute.post("/user", async (req, res) => {
+  try {
+    //get user obj
+    let newUser = req.body;
     //hash password
-    let hashedPassword=await hash(newUser.password,10);
-    //rEPLACE PLain password with new password
-    newUser.password= hashedPassword;
-    //Creating of documnet for the new user
-    let newUserDoc= new UserModel(newUser);
-    //save in DB
+    let hashedPassword = await hash(newUser.password, 12);
+    //replace plain password with hashed password
+    newUser.password = hashedPassword;
+    //create new user doc
+    let newUserDoc = new UserModel(newUser);
+    //save in db
     await newUserDoc.save();
-    //send response
-    res.status(201).json({message:"User Registered Successfully"});
-
-  }
-  catch(err){
-    res.status(400).json({message:err.message});
+    //send res
+    res.status(201).json({ message: "user created" });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
-//Routes for User Login(Authentication)
-userRouter.post("/login",async(req,res)=>{
-  try{
-    //get user object
-    let credobj= req.body;
-    //find user by email
-    let userinDB= await UserModel.findOne({email:credobj.email});
-    if(userinDB==null){
-      return res.status(200).json({message:"User not found"});
-    }
-    else{
-      let isEqual=await compare(credobj.password,userinDB.password)
-      //if passwords do not match
-      if(isEqual== false){
-        res.status(200).json({message:"Invalid Password"});
-      }else{
-        //Generate JWT token
-        let encodedToken=sign({email:credobj.email},"abcdef",{expiresIn:'7d'});
-        res.cookie("token",encodedToken,{
-          httpOnly:true,
-          secure:true,
-          sameSite:"none"
-        } )
-        res.status(200).json({message:"Login Successful"});
+//Route for User authentication(Login)
+userRoute.post("/login", async (req, res) => {
+  try {
+    //get user cred obj
+    let credObj = req.body;
+    //check email
+    let userInDb = await UserModel.findOne({ email: credObj.email });
+    //if user not found
+    if (userInDb === null) {
+      res.status(404).json({ message: "Invalid Email" });
+    } else {
+      //compare password
+      let isEqual = await compare(credObj.password, userInDb.password);
+      //if passwords not matched
+      if (isEqual === false) {
+        res.status(404).json({ message: "Invalid password" });
+      } else {
+        //generate token
+        let encodedToken = sign({ email: userInDb.email }, "abcdef", {
+          expiresIn: "1h",
+        });
+        //save in cookies
+        res.cookie("token", encodedToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+        });
+        //send res
+        res.status(200).json({ message: "login success", payload: userInDb });
       }
     }
-  }
-  catch(err){
-    res.status(500).json({message:"Login failed"});
-  }
-});
-
-userRouter.put("/todo/:userid",async(req,res)=>{
-  //get taskk obj
-  let newTask= req.body;
-  //get user id
-  let uid= req.params.userid;
-  //push newtask
-  let userAfteraddingTodo= await UserModel.findOneAndUpdate(
-    {_id:uid},
-    {$push:{todos:newTask}},)
-  res.status(200).json({message:"Task added successfully",user:userAfteraddingTodo});
-});
-
-userRouter.put("/edit-todo/user/:userid/task/:taskid",async(req,res)=>{
-  try{
-   //get user id and 
-   let {userid,taskid}= req.params;
-   //get updated task details
-   let modifedTaskobj= req.body;
-    //find user by id and update the task
-    let userAftereditingTodo= await UserModel.findOneAndUpdate(
-      {_id:userid,"todos._id":taskid},
-      {
-        $set:{
-          "todos.$.taskName":modifedTaskobj.taskName,
-          "todos.$.description":modifedTaskobj.description,
-          "todos.$.status":modifedTaskobj.status
-        }
-      },{new:true }
-  
-    );
-    res.status(200).json({message:"Task edited successfully"});
-  }
-  catch(err){
-    res.status(500).json({message:"Failed to edit task"});
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
+//Logout User
+userRoute.get("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+  });
+  //res
+  res.status(200).json({ message: "Logout success" });
+});
 
-userRouter.put("/edit-status/user/:userid/task/:taskid", async (req, res) => {
+//Route to add new todo
+userRoute.put("/todo/:userid", async (req, res) => {
+  //get new task obj
+  let newTask = req.body;
+  //get userid from url
+  let uid = req.params.userid;
+  //push newtask to "todos" array of user obj
+  let userAfterAddingTodo = await UserModel.findOneAndUpdate(
+    { _id: uid },
+    { $push: { todos: newTask } },
+    { new: true }
+  );
+  //send res
+  res.status(200).json({ message: "todo added", payload: userAfterAddingTodo });
+});
+
+//Route to edit task
+userRoute.put("/edit-todo/userid/:userid/taskid/:taskid", async (req, res) => {
   try {
-    //get user id and
-    let { userid, taskid } = req.params;
-  
-    //find user by id and update the task
-    let userAftereditingTodo = await UserModel.findOneAndUpdate(
+    //get userid and taskid from url params
+    let { userid, taskid } = req.params; //{userid:"",taskid:""}
+    //get modifed taskobj
+    let modifiedTaskObj = req.body;
+    //update task
+    let userWithModifiedTask = await UserModel.findOneAndUpdate(
       { _id: userid, "todos._id": taskid },
       {
         $set: {
-          "todos.$.status": "completed",
+          "todos.$.taskName": modifiedTaskObj.taskName,
+          "todos.$.description": modifiedTaskObj.description,
+          "todos.$.status": modifiedTaskObj.status,
         },
       },
       { new: true }
     );
-    res.status(200).json({ message: "Task status updated successfully" });
-  } catch (err) {
-    res.status(500).json({ message: "Failed to edit task" });
-  }
+
+    //send res
+    res
+      .status(200)
+      .json({ message: "task modified", payload: userWithModifiedTask });
+  } catch (err) {}
 });
 
-userRouter.put("/delete-todo/user/:userid/task/:taskid",async(req,res)=>{
-  try{
-    //get user id and task id
-    let {userid,taskid}= req.params;
-    //find user by id and delete the task
-    let userAfterdeletingTodo= await UserModel.findOneAndUpdate(
-      {_id:userid},
-      {
-        $pull:{
-          todos:{_id:taskid}
-        }
-      },{new:true });
-      res.status(200).json({message:"Task deleted successfully"});
+//Route to set task as completed
+userRoute.put(
+  "/edit-status/userid/:userid/taskid/:taskid",
+  async (req, res) => {
+    try {
+      //get userid and taskid from url params
+      let { userid, taskid } = req.params; //{userid:"",taskid:""}
+
+      //update task by changing status to "completed"
+      let userWithModifiedTask = await UserModel.findOneAndUpdate(
+        { _id: userid, "todos._id": taskid },
+        {
+          $set: {
+            "todos.$.status": "completed",
+          },
+        },
+        { new: true }
+      );
+
+      //send res
+      res
+        .status(200)
+        .json({
+          message: "task status modified",
+          payload: userWithModifiedTask,
+        });
+    } catch (err) {}
   }
-  catch(err){
-    res.status(500).json({message:"Failed to delete task"});
+);
+
+//Route to delete a task
+userRoute.put(
+  "/delete-todo/userid/:userid/taskid/:taskid",
+  async (req, res) => {
+    try {
+      //get userid and taskid from url params
+      let { userid, taskid } = req.params; //{userid:"",taskid:""}
+
+      //update task by changing status to "completed"
+      let userWithModifiedTask = await UserModel.findOneAndUpdate(
+        { _id: userid },
+        { $pull: { todos: { _id: taskid } } },
+        { new: true }
+      );
+
+      //send res
+      res
+        .status(200)
+        .json({ message: "task deleted", payload: userWithModifiedTask });
+    } catch (err) {}
   }
-});
+);

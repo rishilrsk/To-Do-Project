@@ -1,21 +1,20 @@
 import jwt from "jsonwebtoken";
 const { verify } = jwt;
 
-
-export function verifyToken (req,res,next){
-  try{
-     //get token from cookies
-     const encodedToken= req.cookies.token;
-     if(encodedToken==undefined){
-      return res.status(401).json({message:"Please login first"});}
+export function verifyToken(req, res, next) {
+  //get token from cookie
+  const encodedToken = req.cookies.token;
+  //if encodedtoken not found
+  if (encodedToken === undefined) {
+    res.status(401).json({ nessage: Unauthorized });
+  } else {
+    try {
       //verify token
-      else{
-         const decodedToken = verify(encryptedToken, "abcdef");
-         res.json({ message: "Token verified", payload: decodedToken });
-         next();
-      }
-  }
-  catch(err){
-    res.status(401).json({message:"Session Expired. Please login again."});
+      let decodedToken = verify(encodedToken, "abcdef");
+      //forward req to next
+      next();
+    } catch (err) {
+      res.status(401).json({ nessage: "Session expired" });
+    }
   }
 }
