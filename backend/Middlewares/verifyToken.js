@@ -11,6 +11,7 @@ export function verifyToken(req, res, next) {
     try {
       //verify token
       let decodedToken = verify(encodedToken, "abcdef");
+      req.user=decodedToken;
       //forward req to next
       next();
     } catch (err) {

@@ -28,49 +28,50 @@ function Login() {
   }, [loginStatus]);
 
   return (
-    <div>
-      <h1 className="text-center">User Login</h1>
-
-      {/* display login error message */}
-      {loginErrMessage.length !== 0 && (
-        <p className="fs-3 text-center text-danger">{loginErrMessage}</p>
-      )}
-
-      {/* login form */}
-      <form
-        className="w-50 mx-auto mt-5"
-        onSubmit={handleSubmit(onLoginFormSubmit)}
-      >
-        <div className="mb-3">
-          <input
-            type="email"
-            {...register("email", { required: true })}
-            className="form-control p-3"
-            placeholder="Email"
-          />
-          {/* email vaildation error messages */}
-          {errors.email?.type === "required" && (
-            <p className="text-danger">Email is required</p>
-          )}
+    <div className="container py-5 d-flex justify-content-center">
+      <div className="soft-card p-4 p-md-5 w-100" style={{ maxWidth: '450px' }}>
+        <div className="text-center mb-4">
+          <h2 className="fw-bold" style={{ letterSpacing: '-0.5px' }}>Welcome back</h2>
+          <p className="text-soft-secondary mb-0">Please enter your details to sign in.</p>
         </div>
-        <div className="mb-3">
-          <input
-            type="password"
-            {...register("password", { required: true })}
-            className="form-control p-3"
-            placeholder="Password"
-          />
-          {/* name vaildation error messages */}
-          {errors.password?.type === "required" && (
-            <p className="text-danger">Password is required</p>
-          )}
-        </div>
-        <div className="">
-          <button type="submit" className="btn btn-primary p-2 px-4 w-100">
-            Login
+
+        {/* display login error message */}
+        {loginErrMessage.length !== 0 && (
+          <div className="alert alert-danger py-2 px-3 text-center mb-4" style={{ borderRadius: 'var(--radius-md)', fontSize: '0.9rem' }}>
+            {loginErrMessage}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onLoginFormSubmit)}>
+          <div className="mb-4 text-start">
+            <label className="form-label fw-medium text-soft-secondary" style={{ fontSize: '0.875rem' }}>Email address</label>
+            <input
+              type="email"
+              {...register("email", { required: true })}
+              className="form-control soft-input w-100"
+              placeholder="name@example.com"
+            />
+            {errors.email?.type === "required" && (
+              <p className="text-danger mt-1 mb-0" style={{ fontSize: '0.8rem' }}>Email is required</p>
+            )}
+          </div>
+          <div className="mb-4 text-start">
+            <label className="form-label fw-medium text-soft-secondary" style={{ fontSize: '0.875rem' }}>Password</label>
+            <input
+              type="password"
+              {...register("password", { required: true })}
+              className="form-control soft-input w-100"
+              placeholder="••••••••"
+            />
+            {errors.password?.type === "required" && (
+              <p className="text-danger mt-1 mb-0" style={{ fontSize: '0.8rem' }}>Password is required</p>
+            )}
+          </div>
+          <button type="submit" className="soft-btn-primary w-100 mt-2">
+            Sign In
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
