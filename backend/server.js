@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import { userRoute } from "./APIs/UserAPI.js";
 import cors from "cors";
 import { verifyToken } from "./Middlewares/verifyToken.js";
-import { UserModel } from "./models/UserModel.js";
+import { UserModel } from "./Models/UserModel.js";
 const app = express();
 
 //enable cors

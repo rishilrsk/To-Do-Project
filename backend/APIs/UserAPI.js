@@ -1,7 +1,7 @@
 //create min-express app
 import express from "express";
 import { hash, compare } from "bcryptjs";
-import { UserModel } from "../models/UserModel.js";
+import { UserModel } from "../Models/UserModel.js";
 import jwt from "jsonwebtoken";
 const { sign } = jwt;
 export const userRoute = express.Router();
