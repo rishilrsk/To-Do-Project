@@ -1,6 +1,8 @@
 # Task Management Application
 
-A minimalist, modern Task Management web application built with the MERN stack (MongoDB, Express, React, Node.js). 
+**🚀 Live Demo:** [https://task-management-amber-phi.vercel.app/](https://task-management-amber-phi.vercel.app/)
+
+A minimalist, modern Task Management web application built with the MERN stack (MongoDB, Express, React, Node.js).
 
 ## Features
 - **User Authentication:** Secure registration and login using JWT and HTTP-only cookies.
